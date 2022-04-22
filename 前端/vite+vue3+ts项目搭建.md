@@ -451,6 +451,102 @@ yarn add less --dev
 yarn add scss --dev
 ```
 
+### 配置stylelint
+
+安装
+
+```sh
+# 安装 stylelint, 
+yarn add stylelint stylelint-scss postcss-less postcss-scss postcss-html --save-dev
+```
+
+配置.stylelintrc.js
+```js
+module.exports = {
+  extends: 'stylelint-config-standard',
+  rules: {
+    "no-duplicate-selectors": null,
+    "number-leading-zero": "always",
+    "block-no-empty": null,
+    "selector-class-pattern": null,
+    "declaration-block-no-redundant-longhand-properties": [
+      true,
+      { "ignoreShorthands": ["/flex/"] },
+    ],
+    "custom-property-pattern": null,
+    "keyframes-name-pattern": null,
+    "no-empty-source": null,
+    "font-family-no-missing-generic-family-keyword": [
+      true,
+      {
+        "ignoreFontFamilies": ["PingFangSC-Regular", "PingFangSC-Medium", "t"],
+      }
+    ],
+    "unit-no-unknown": [true, { "ignoreUnits": ["rpx"] }],
+    "function-url-quotes": null,
+    "max-line-length": null,
+    "at-rule-empty-line-before": ["always", { "ignore": ["after-comment"] }],
+    "declaration-colon-newline-after": null,
+    "no-descending-specificity": null,
+    "selector-type-no-unknown": null,
+    "color-function-notation": "legacy",
+  },
+  overrides: [
+    { 
+      files: ["**/*.less"],
+      customSyntax: "postcss-less",
+    },
+    {
+      files: ['**/*.scss'],
+      customSyntax: 'postcss-scss',
+    },
+    {
+      files: ['*.html', '**/*.{html,vue}'],
+      customSyntax: 'postcss-html',
+    },
+  ],
+};
+```
+
+配置.stylelintignore
+```sh
+# .stylelintignore
+node_modules
+
+# 旧的不需打包的样式库
+*.min.css
+
+# 其他类型文件
+*.js
+*.jpg
+*.png
+*.eot
+*.ttf
+*.woff
+*.json
+
+# 测试和打包目录
+/test/
+/dist/
+```
+
+配置package.json增加命令
+```sh
+{
+  "scripts": {
+    "stylelint": "stylelint src/**/*.{html,vue,css,less,sass,scss} --allow-empty-input --fix",
+  },
+  "lint-staged": {
+    "*.{vue,js,ts}": "eslint --fix",
+    "src/**/*.{html,vue,css,sass,scss,less}": [
+      "stylelint",
+      "git add"
+    ]
+  },
+}
+```
+
+
 ### 示例
 
 完整的代码托管在[Vue3-Ts-Boilerplate](https://github.com/LoopZhou/Vue3-Ts-Boilerplate)
