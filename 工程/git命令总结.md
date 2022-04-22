@@ -144,3 +144,21 @@ git cherry-pick --abort
 #退出 cherry-pick, 不回到操作前的样子。即保留已经 cherry-pick 成功的 commit
 git cherry-pick --quit
 ```
+
+### init
+
+```sh
+# 初始化本地仓库，在当前目录下生成 .git 文件夹
+$ git init
+```
+
+### merge
+
+```sh
+# 把指定的分支合并到当前所在的分支下，并自动进行新的提交
+$ git merge <分支名称>
+
+# 把指定的分支合并到当前所在的分支下，不进行新的提交
+$ git merge --no-commit <分支名称>
+```
+
