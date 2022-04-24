@@ -546,6 +546,52 @@ node_modules
 }
 ```
 
+### 配置路由
+
+安装
+```sh
+yarn add vue-router
+```
+
+app.vue调整到@/views/index.vue中，调整引入路径
+
+app.vue调整
+```vue
+<template>
+  <router-view />
+</template>
+```
+
+router/index.ts增加路由配置
+```ts
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'index',
+    component: () => import('@/views/home-index.vue'),
+  },
+];
+
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes,
+});
+
+export default router;
+```
+
+main.ts增加use route
+```ts
+import router from './router';
+
+// 创建vue实例
+const app = createApp(App);
+app.use(router);
+// 挂载实例
+app.mount('#app');
+```
 
 ### 示例
 
