@@ -683,6 +683,70 @@ const onChange = () => {
 </script>
 ```
 
+### 配置TSX
+
+安装
+```sh
+npm install @vitejs/plugin-vue-jsx -D
+```
+
+vite.config.js中配置
+```js
+import vueJsx from '@vitejs/plugin-vue-jsx';
+
+export default defineConfig({
+  plugins: [vue(), vueJsx()],
+  ...
+});
+```
+
+tsconfig.json中配置alias别名，防止引入找不到文件
+```json
+{
+  "compilerOptions": {
+    ...
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.jsx"],
+}
+```
+创建tsx文件
+```tsx
+import { defineComponent, ref } from "vue";
+
+export default defineComponent({
+  setup() {
+    const title = ref("test tsx config");
+
+    return {
+      title,
+    };
+  },
+  render() {
+    return (
+      <div>
+        <p>{this.title}</p>
+      </div>
+    );
+  },
+});
+```
+
+router中使用
+```ts
+const routes: Array<RouteRecordRaw> = [
+  ...
+  {
+    path: '/tsx-test',
+    name: 'tsx',
+    component: () => import('@/views/tsx-test'),
+  },
+];
+```
+
 ### 示例
 
 完整的代码托管在[Vue3-Ts-Boilerplate](https://github.com/LoopZhou/Vue3-Ts-Boilerplate)
