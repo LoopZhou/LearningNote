@@ -747,6 +747,29 @@ const routes: Array<RouteRecordRaw> = [
 ];
 ```
 
+### 使用web-worker
+
+[vite使用](https://cn.vitejs.dev/guide/features.html#web-workers)
+
+vite中不需要像webpack需要配置work-loader， 可以在导入请求上添加 ?worker 或 ?sharedworker 查询参数来直接导入一个 web worker 脚本
+
+```js
+import MyWorker from './worker?worker'
+const worker = new MyWorker()
+```
+
+默认情况下，worker 脚本将在生产构建中编译成单独的 chunk。如果你想将 worker 内联为 base64 字符串，请添加 inline 查询参数：
+
+```js
+import MyWorker from './worker?worker&inline'
+```
+
+如果你想要将一个 URL 的形式读取该 worker，请添加 url 这个 query：
+
+```js
+import MyWorker from './worker?worker&url'
+```
+
 ### 示例
 
 完整的代码托管在[Vue3-Ts-Boilerplate](https://github.com/LoopZhou/Vue3-Ts-Boilerplate)
