@@ -588,3 +588,124 @@ requestAnimationFrame(() => {
   }
 });
 ```
+
+### 后处理
+
+引入后处理包
+```js
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+
+// 已提供的后处理器
+import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
+import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
+
+// 可自定义后处理
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+```
+
+初始化定义效果器
+```js
+this.composer = new EffectComposer(this.renderer);
+
+// 第二个参数可指定renderTarget
+const renderTarget = new THREE.WebGLRenderTarget(800, 600);
+const effectComposer = new EffectComposer(renderer, renderTarget)
+```
+
+设置参数(和render类似)
+```js
+this.composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+this.composer.setSize(window.innerWidth, window.innerHeight);
+```
+
+添加基本renderpass
+```js
+// 当前屏幕
+const renderModel = new RenderPass(this.scene, this.camera);
+this.composer.addPass(renderModel);
+```
+
+使用已提供的后处理
+```js
+const effectBloom = new BloomPass(2);
+this.composer.addPass(effectBloom);
+
+const effectFilm = new FilmPass(0.35, 0.95, 2048, 0);
+this.composer?.addPass(effectFilm);
+```
+
+
+使用自定义后处理
+```js
+const TintShader = {
+  // 变量
+  uniforms: {
+    // 后处理中屏幕当成纹理传入到tDiffuse
+    tDiffuse: { value: null },
+    uTint: { value: null },
+  },
+  // 顶点着色器
+  vertexShader: vertexShader,
+  // 片段着色器
+  fragmentShader: tintFS,
+};
+
+const tintPass = new ShaderPass(TintShader);
+tintPass.material.uniforms.uTint.value = new THREE.Vector3();
+this.composer.addPass(tintPass);
+```
+
+其中，顶点着色器一般是普通的矩阵变换
+```c
+varying vec2 vUv;
+
+void main()
+{
+	vUv=uv;
+	vec4 mvPosition=modelViewMatrix*vec4(position,1.);
+	gl_Position=projectionMatrix*mvPosition;
+}
+```
+
+片段着色器中tDiffuse为RenderPass定义的屏幕
+```c
+uniform sampler2D tDiffuse;
+uniform vec3 uTint;
+varying vec2 vUv;
+
+void main() {
+  vec4 color = texture2D(tDiffuse, vUv);
+  color.rgb += uTint;
+
+  gl_FragColor = color;
+}
+```
+
+最后在渲染循环中，替换renderer, 使用composer渲染
+```js
+animate(): void {
+  // this.renderer.render(this.scene, this.camera);
+  this.composer.render(0.01);
+  
+  ...
+
+  requestAnimationFrame(() => {
+    this.animate();
+  });
+}
+```
+
+在监听window变换时，composer和renderer的操作类似
+```js
+initListener(): void {
+  window.addEventListener('resize', () => {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.composer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+```
+
+
