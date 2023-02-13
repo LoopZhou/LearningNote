@@ -526,8 +526,157 @@ function App() {
 export default App;
 ```
 
+### 状态管理
 
+使用@reduxjs/toolkit进行状态管理
 
+安装
+```sh
+yarn add redux react-redux @reduxjs/toolkit
+```
+
+store文件目录
+```
+store
+    ├── features
+    │   ├── counterSlice.ts
+    │   └── userSlice.ts
+    └── index.ts
+```
+
+定义模块
+counterSlice
+```ts
+import { createSlice } from '@reduxjs/toolkit';
+
+const counterSlice = createSlice({
+  name: 'counter',
+
+  initialState: {
+    value: 0,
+  },
+
+  reducers: {
+    incremented: (state) => {
+      state.value += 1;
+    },
+    decremented: (state) => {
+      state.value -= 1;
+    },
+    add: (state, action) => {
+      state.value += action.payload;
+    },
+  },
+});
+
+export const { incremented, decremented, add } = counterSlice.actions;
+
+export default counterSlice.reducer;
+```
+
+userSlice
+```ts
+import { createSlice } from '@reduxjs/toolkit';
+
+const userSlice = createSlice({
+  name: 'user',
+
+  initialState: {
+    name: 'randy',
+    age: 24,
+  },
+
+  reducers: {
+    nameIncrement: (state) => {
+      state.name += '!';
+    },
+    nameDecrement: (state) => {
+      state.name += state.name.slice(0, state.name.length - 1);
+    },
+    ageIncremented: (state, action) => {
+      state.age += action.payload;
+    },
+    ageDecremented: (state, action) => {
+      state.age -= action.payload;
+    },
+  },
+});
+
+export const { nameIncrement, nameDecrement, ageIncremented, ageDecremented } =
+  userSlice.actions;
+
+export default userSlice.reducer;
+```
+
+index.ts
+```ts
+import { configureStore } from '@reduxjs/toolkit';
+import counterSlice from './features/counterSlice';
+import userSlice from './features/userSlice';
+
+const store: any = configureStore({
+  reducer: {
+    counter: counterSlice,
+    user: userSlice,
+  },
+});
+
+export default store;
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+使用store， 在main.tsx
+```ts
+import { Provider } from "react-redux";
+import store from "./store";
+
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+函数组件中使用：使用useSelector、useDispatch两个Hook来操作store
+```ts
+import { useSelector, useDispatch } from 'react-redux';
+import { ageIncremented } from '@/store/features/userSlice';
+import { incremented } from '@/store/features/counterSlice';
+import type { RootState } from '@/store/index';
+
+function Store() {
+  const counter = useSelector((state: RootState) => state.counter.value);
+  const age = useSelector((state: RootState) => state.user.age);
+  const dispatch = useDispatch();
+
+  const userAgeIncremented = () => {
+    dispatch(ageIncremented(5));
+  };
+
+  const counterIncremented = () => {
+    dispatch(incremented());
+  };
+
+  return (
+    <div className="Store">
+      <h1>Counter</h1>
+      <div>
+        <span>counter:</span>
+        <span>{counter}</span>
+        <div>
+          <button onClick={counterIncremented}>counter add</button>
+        </div>
+      </div>
+      <h1>User</h1>
+      <div>
+        <button onClick={userAgeIncremented}>age is {age}</button>
+      </div>
+    </div>
+  );
+}
+
+export default Store;
+```
 
 ### 示例
 
